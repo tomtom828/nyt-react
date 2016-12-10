@@ -1,0 +1,1 @@
+// Displays the Saved Articles that were searched and stored in the database
