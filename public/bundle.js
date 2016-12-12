@@ -22020,18 +22020,19 @@
 	
 	// UN COMMENT ALL THESE LATER!
 	// Here we include all of the sub-components
-	//var Search = require("./Search");
-	//var Saved = require("./Saved");
+	var Query = __webpack_require__(/*! ./Query.jsx */ 179);
+	var Search = __webpack_require__(/*! ./Search.jsx */ 180);
+	var Saved = __webpack_require__(/*! ./Saved.jsx */ 181);
 	
 	// Requiring our helper for making API calls
 	//var helpers = require("../utils/helpers");
 	
-	// Create the Parent Component
+	// Create the Main Component
 	var Main = React.createClass({
 	  displayName: "Main",
 	
 	
-	  // Here we set a generic state associated with the number of clicks
+	  // Here we set a generic state
 	  getInitialState: function getInitialState() {
 	    return {
 	      test: 0
@@ -22044,33 +22045,331 @@
 	  render: function render() {
 	    return React.createElement(
 	      "div",
-	      { className: "container" },
+	      { className: "container", style: { backgroundColor: "white", borderStyle: "solid", borderWidth: "1px" } },
 	      React.createElement(
 	        "div",
-	        { className: "row" },
+	        { className: "page-header" },
 	        React.createElement(
-	          "div",
-	          { className: "jumbotron" },
+	          "h1",
+	          { className: "text-center" },
+	          React.createElement("img", { style: { width: "70%" }, src: "img/nyt-header.svg", alt: "The New York Times" })
+	        ),
+	        React.createElement(
+	          "h2",
+	          { className: "text-center", style: { marginTop: "-12px" } },
 	          React.createElement(
-	            "h2",
+	            "b",
 	            null,
-	            "New York Times ",
 	            React.createElement(
-	              "b",
+	              "i",
 	              null,
-	              "React"
-	            ),
-	            "ions!"
-	          ),
-	          React.createElement("hr", null)
+	              "A React Rendition"
+	            )
+	          )
+	        ),
+	        React.createElement(
+	          "h4",
+	          { className: "text-center" },
+	          "Search for and annotate articles of interest"
 	        )
-	      )
+	      ),
+	      React.createElement(Query, null),
+	      React.createElement(Search, null),
+	      React.createElement(Saved, null)
 	    );
 	  }
 	});
 	
 	// Export the component back for use in other files
 	module.exports = Main;
+
+/***/ },
+/* 179 */
+/*!*******************************************!*\
+  !*** ./app/components/children/Query.jsx ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	// Queries the NYT API for articles. 
+	// Contains the user's search form.
+	
+	
+	// Include React
+	var React = __webpack_require__(/*! react */ 1);
+	
+	// Create the Search Component
+	var Query = React.createClass({
+	  displayName: "Query",
+	
+	
+	  // Here we set a generic state
+	  getInitialState: function getInitialState() {
+	    return {
+	      test: 0
+	    };
+	  },
+	
+	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	
+	  // Here we render the Query User Form
+	  render: function render() {
+	    return React.createElement(
+	      "div",
+	      { className: "panel panel-default" },
+	      React.createElement(
+	        "div",
+	        { className: "panel-heading" },
+	        React.createElement(
+	          "h3",
+	          { className: "panel-title text-center", style: { fontSize: "20px" } },
+	          React.createElement(
+	            "i",
+	            null,
+	            React.createElement(
+	              "b",
+	              null,
+	              "Search"
+	            )
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        "div",
+	        { className: "panel-body text-center" },
+	        React.createElement(
+	          "form",
+	          { role: "form" },
+	          React.createElement(
+	            "div",
+	            { className: "form-group col-md-offset-3 col-md-6" },
+	            React.createElement(
+	              "label",
+	              { "for": "topic", className: "text-center" },
+	              "Topic"
+	            ),
+	            React.createElement("input", { type: "text", className: "form-control text-center", id: "topic" })
+	          ),
+	          React.createElement("br", null),
+	          React.createElement(
+	            "div",
+	            { className: "form-group col-md-offset-3 col-md-6" },
+	            React.createElement(
+	              "label",
+	              { "for": "startYear" },
+	              "Start Year"
+	            ),
+	            React.createElement("input", { type: "text", className: "form-control text-center", id: "startYear" })
+	          ),
+	          React.createElement("br", null),
+	          React.createElement(
+	            "div",
+	            { className: "form-group col-md-offset-3 col-md-6" },
+	            React.createElement(
+	              "label",
+	              { "for": "endYear" },
+	              "End Year"
+	            ),
+	            React.createElement("input", { type: "text", className: "form-control text-center", id: "endYear" })
+	          ),
+	          React.createElement("br", null),
+	          React.createElement(
+	            "button",
+	            { type: "submit", className: "btn btn-info col-md-offset-5 col-md-2", id: "searchBtn" },
+	            "Search"
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// Export the component back for use in Main file
+	module.exports = Query;
+
+/***/ },
+/* 180 */
+/*!********************************************!*\
+  !*** ./app/components/children/Search.jsx ***!
+  \********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	// Displays API search results from another possible Query component and Results component. 
+	// Gives the user the ability to save an article to their Saved Articles.
+	
+	// Include React
+	var React = __webpack_require__(/*! react */ 1);
+	
+	// Create the Search Component
+	var Search = React.createClass({
+	  displayName: "Search",
+	
+	
+	  // Here we set a generic state
+	  getInitialState: function getInitialState() {
+	    return {
+	      test: 0
+	    };
+	  },
+	
+	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	
+	  // Here we render the Search Results Panel
+	  render: function render() {
+	    return React.createElement(
+	      "div",
+	      { className: "panel panel-default" },
+	      React.createElement(
+	        "div",
+	        { className: "panel-heading" },
+	        React.createElement(
+	          "h3",
+	          { className: "panel-title text-center", style: { fontSize: "20px" } },
+	          React.createElement(
+	            "i",
+	            null,
+	            React.createElement(
+	              "b",
+	              null,
+	              "Results"
+	            )
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        "div",
+	        { className: "panel-body" },
+	        React.createElement(
+	          "ul",
+	          { className: "list-group col-md-8 col-md-offset-2" },
+	          React.createElement(
+	            "li",
+	            { className: "list-group-item", style: { borderWidth: "0px" } },
+	            React.createElement(
+	              "div",
+	              { className: "input-group" },
+	              React.createElement(
+	                "div",
+	                { type: "text", className: "form-control" },
+	                React.createElement(
+	                  "b",
+	                  null,
+	                  "Obama Gives Commencement"
+	                )
+	              ),
+	              React.createElement(
+	                "span",
+	                { className: "input-group-btn" },
+	                React.createElement(
+	                  "button",
+	                  { className: "btn btn-success", type: "button" },
+	                  "Save"
+	                )
+	              )
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// Export the component back for use in Main file
+	module.exports = Search;
+
+/***/ },
+/* 181 */
+/*!*******************************************!*\
+  !*** ./app/components/children/Saved.jsx ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	// Displays the Saved Articles that were searched and stored in the database
+	
+	// Include React
+	var React = __webpack_require__(/*! react */ 1);
+	
+	// Create the Search Component
+	var Saved = React.createClass({
+	  displayName: "Saved",
+	
+	
+	  // Here we set a generic state
+	  getInitialState: function getInitialState() {
+	    return {
+	      test: 0
+	    };
+	  },
+	
+	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	
+	  // Here we render the Search Results Panel
+	  render: function render() {
+	    return React.createElement(
+	      "div",
+	      { className: "panel panel-default" },
+	      React.createElement(
+	        "div",
+	        { className: "panel-heading" },
+	        React.createElement(
+	          "h3",
+	          { className: "panel-title text-center", style: { fontSize: "20px" } },
+	          React.createElement(
+	            "i",
+	            null,
+	            React.createElement(
+	              "b",
+	              null,
+	              "Saved Articles"
+	            )
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        "div",
+	        { className: "panel-body" },
+	        React.createElement(
+	          "ul",
+	          { className: "list-group col-md-8 col-md-offset-2" },
+	          React.createElement(
+	            "li",
+	            { className: "list-group-item", style: { borderWidth: "0px" } },
+	            React.createElement(
+	              "div",
+	              { className: "input-group" },
+	              React.createElement(
+	                "div",
+	                { type: "text", className: "form-control" },
+	                React.createElement(
+	                  "b",
+	                  null,
+	                  "Giant Panda Rampages through NYC"
+	                )
+	              ),
+	              React.createElement(
+	                "span",
+	                { className: "input-group-btn" },
+	                React.createElement(
+	                  "button",
+	                  { className: "btn btn-danger", type: "button" },
+	                  "Remove"
+	                )
+	              )
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// Export the component back for use in Main file
+	module.exports = Saved;
 
 /***/ }
 /******/ ]);

@@ -6,16 +6,17 @@ var React = require("react");
 
 // UN COMMENT ALL THESE LATER!
 // Here we include all of the sub-components
-//var Search = require("./Search");
-//var Saved = require("./Saved");
+var Query = require("./Query.jsx");
+var Search = require("./Search.jsx");
+var Saved = require("./Saved.jsx");
 
 // Requiring our helper for making API calls
 //var helpers = require("../utils/helpers");
 
-// Create the Parent Component
+// Create the Main Component
 var Main = React.createClass({
 
-  // Here we set a generic state associated with the number of clicks
+  // Here we set a generic state
   getInitialState: function() {
     return {
       test: 0
@@ -27,16 +28,21 @@ var Main = React.createClass({
   // Here we render the function
   render: function() {
     return (
-      <div className="container">
 
-        <div className="row">
+      <div className="container" style={ {backgroundColor: "white", borderStyle: "solid", borderWidth: "1px"} }>
 
-          <div className="jumbotron">
-            <h2>New York Times <b>React</b>ions!</h2>
-            <hr />
-          </div>
+        <div className="page-header">
+          <h1 className="text-center"><img style={ {width: "70%"} } src="img/nyt-header.svg" alt="The New York Times"/></h1>
+          <h2 className="text-center" style={ {marginTop: "-12px"} }><b><i>A React Rendition</i></b></h2>
+          <h4 className="text-center">Search for and annotate articles of interest</h4>
         </div>
+
+        <Query />
+        <Search />
+        <Saved />
+
       </div>
+
     );
   }
 });
