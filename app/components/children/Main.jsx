@@ -11,7 +11,7 @@ var Search = require("./Search.jsx");
 var Saved = require("./Saved.jsx");
 
 // Requiring our helper for making API calls
-var helpers = require("../utils/helpers.js");
+//var helpers = require("../utils/helpers.js");
 
 // Create the Main Component
 var Main = React.createClass({

@@ -1,8 +1,8 @@
 // Displays the Saved Articles that were searched and stored in the database
 
+
 // Include React
 var React = require("react");
-
 
 // Create the Search Component
 var Saved = React.createClass({
