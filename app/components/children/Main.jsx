@@ -19,11 +19,25 @@ var Main = React.createClass({
   // Here we set a generic state
   getInitialState: function() {
     return {
-      test: 0
+      apiResults: "",
+      mongoResults: "",
+      topic: "",
+      startYear: "",
+      endYear: ""
     };
   },
 
-  // NEED TO INCLUDE MORE FUNCTIONS HERE
+  // These functions allow children to update the parent.
+  setTopic: function(term) {
+    this.setState({ topic: term });
+  },
+  setStartYear: function(term) {
+    this.setState({ startYear: term });
+  },
+  setEndYear: function(term) {
+    this.setState({ endYear: term });
+  },
+
 
   // Here we render the function
   render: function() {
@@ -37,10 +51,12 @@ var Main = React.createClass({
           <h4 className="text-center">Search for and annotate articles of interest</h4>
         </div>
 
-        <Query />
-        <Search />
+        <Query setTopic={this.setTopic} setStartYear={this.setStartYear} setEndYear={this.setEndYear} />
+        <Search apiResults={this.state.apiResults} />
         <Saved />
-
+        {this.state.topic}
+        {this.state.startYear}
+        {this.state.endYear}
       </div>
 
     );

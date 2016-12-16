@@ -22035,11 +22035,24 @@
 	  // Here we set a generic state
 	  getInitialState: function getInitialState() {
 	    return {
-	      test: 0
+	      apiResults: "",
+	      mongoResults: "",
+	      topic: "",
+	      startYear: "",
+	      endYear: ""
 	    };
 	  },
 	
-	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	  // These functions allow children to update the parent.
+	  setTopic: function setTopic(term) {
+	    this.setState({ topic: term });
+	  },
+	  setStartYear: function setStartYear(term) {
+	    this.setState({ startYear: term });
+	  },
+	  setEndYear: function setEndYear(term) {
+	    this.setState({ endYear: term });
+	  },
 	
 	  // Here we render the function
 	  render: function render() {
@@ -22073,9 +22086,12 @@
 	          "Search for and annotate articles of interest"
 	        )
 	      ),
-	      React.createElement(Query, null),
-	      React.createElement(Search, null),
-	      React.createElement(Saved, null)
+	      React.createElement(Query, { setTopic: this.setTopic, setStartYear: this.setStartYear, setEndYear: this.setEndYear }),
+	      React.createElement(Search, { apiResults: this.state.apiResults }),
+	      React.createElement(Saved, null),
+	      this.state.topic,
+	      this.state.startYear,
+	      this.state.endYear
 	    );
 	  }
 	});
@@ -22107,11 +22123,40 @@
 	  // Here we set a generic state
 	  getInitialState: function getInitialState() {
 	    return {
-	      test: 0
+	      topic: "",
+	      startYear: "",
+	      endYear: ""
 	    };
 	  },
 	
-	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	  // When a user submits...
+	  _handleSubmit: function _handleSubmit(event) {
+	    // prevent the HTML from trying to submit a form if the user hits "Enter" instead of
+	    // clicking the button
+	    event.preventDefault();
+	
+	    // Set the parent to have the search terms
+	    this.props.setTopic(this.state.topic);
+	    this.props.setStartYear(this.state.startYear);
+	    this.props.setEndYear(this.state.endYear);
+	
+	    // Reset the search terms
+	    this.setState({ topic: "" });
+	    this.setState({ startYear: "" });
+	    this.setState({ endYear: "" });
+	  },
+	
+	  _handleTopicChange: function _handleTopicChange(e) {
+	    this.setState({ topic: e.target.value });
+	  },
+	
+	  _handleStartYearChange: function _handleStartYearChange(e) {
+	    this.setState({ startYear: e.target.value });
+	  },
+	
+	  _handleEndYearChange: function _handleEndYearChange(e) {
+	    this.setState({ endYear: e.target.value });
+	  },
 	
 	  // Here we render the Query User Form
 	  render: function render() {
@@ -22140,16 +22185,16 @@
 	        { className: "panel-body text-center" },
 	        React.createElement(
 	          "form",
-	          { role: "form" },
+	          { role: "form", onSubmit: this._handleSubmit },
 	          React.createElement(
 	            "div",
 	            { className: "form-group col-md-offset-3 col-md-6" },
 	            React.createElement(
 	              "label",
-	              { "for": "topic", className: "text-center" },
+	              { htmlFor: "topic", className: "text-center" },
 	              "Topic"
 	            ),
-	            React.createElement("input", { type: "text", className: "form-control text-center", id: "topic" })
+	            React.createElement("input", { type: "text", className: "form-control text-center", id: "topic", onChange: this._handleTopicChange })
 	          ),
 	          React.createElement("br", null),
 	          React.createElement(
@@ -22157,10 +22202,10 @@
 	            { className: "form-group col-md-offset-3 col-md-6" },
 	            React.createElement(
 	              "label",
-	              { "for": "startYear" },
+	              { htmlFor: "startYear" },
 	              "Start Year"
 	            ),
-	            React.createElement("input", { type: "text", className: "form-control text-center", id: "startYear" })
+	            React.createElement("input", { type: "text", className: "form-control text-center", id: "startYear", onChange: this._handleStartYearChange })
 	          ),
 	          React.createElement("br", null),
 	          React.createElement(
@@ -22168,10 +22213,10 @@
 	            { className: "form-group col-md-offset-3 col-md-6" },
 	            React.createElement(
 	              "label",
-	              { "for": "endYear" },
+	              { htmlFor: "endYear" },
 	              "End Year"
 	            ),
-	            React.createElement("input", { type: "text", className: "form-control text-center", id: "endYear" })
+	            React.createElement("input", { type: "text", className: "form-control text-center", id: "endYear", onChange: this._handleEndYearChange })
 	          ),
 	          React.createElement("br", null),
 	          React.createElement(
