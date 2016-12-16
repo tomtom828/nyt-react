@@ -29,15 +29,20 @@ var Search = React.createClass({
         <div className="panel-body">
           <ul className="list-group col-md-8 col-md-offset-2">
 
-            {/* ++++++++++++++++++++++++++ NEED TO ITERATE OVER THIS ++++++++++++++++++++++++++ */}
-            <li className="list-group-item" style={ {borderWidth: "0px"} }>
-              <div className="input-group">
-                <div type="text" className="form-control"><b>Obama Gives Commencement</b></div>
-                <span className="input-group-btn">
-                  <button className="btn btn-success" type="button">Save</button>
-                </span>
-              </div>
-            </li>
+            {/* ++++++++++++++++++++++++++++++++ ITERATE HERE ++++++++++++++++++++++++++++++++ */}
+            {/* Here we use a map function to loop through an array in JSX */}
+            {this.props.apiResults.map(function(search, i) {
+              return (
+                <li key={search._id} className="list-group-item" style={ {borderWidth: "0px"} }>
+                  <div className="input-group">
+                    <div type="text" className="form-control"><b>{search.headline.main}</b></div>
+                    <span className="input-group-btn">
+                      <button className="btn btn-success" type="button">Save</button>
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
 
           </ul>
         </div>

@@ -19,7 +19,7 @@ var Main = React.createClass({
   // Here we set a generic state
   getInitialState: function() {
     return {
-      apiResults: "",
+      apiResults: [],
       mongoResults: "",
       topic: "",
       startYear: "",
@@ -67,9 +67,7 @@ var Main = React.createClass({
         <Query setTopic={this.setTopic} setStartYear={this.setStartYear} setEndYear={this.setEndYear} />
         <Search apiResults={this.state.apiResults} />
         <Saved />
-        {this.state.topic}
-        {this.state.startYear}
-        {this.state.endYear}
+
       </div>
 
     );

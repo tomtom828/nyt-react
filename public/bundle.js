@@ -22035,7 +22035,7 @@
 	  // Here we set a generic state
 	  getInitialState: function getInitialState() {
 	    return {
-	      apiResults: "",
+	      apiResults: [],
 	      mongoResults: "",
 	      topic: "",
 	      startYear: "",
@@ -22100,10 +22100,7 @@
 	      ),
 	      React.createElement(Query, { setTopic: this.setTopic, setStartYear: this.setStartYear, setEndYear: this.setEndYear }),
 	      React.createElement(Search, { apiResults: this.state.apiResults }),
-	      React.createElement(Saved, null),
-	      this.state.topic,
-	      this.state.startYear,
-	      this.state.endYear
+	      React.createElement(Saved, null)
 	    );
 	  }
 	});
@@ -22302,32 +22299,34 @@
 	        React.createElement(
 	          "ul",
 	          { className: "list-group col-md-8 col-md-offset-2" },
-	          React.createElement(
-	            "li",
-	            { className: "list-group-item", style: { borderWidth: "0px" } },
-	            React.createElement(
-	              "div",
-	              { className: "input-group" },
+	          this.props.apiResults.map(function (search, i) {
+	            return React.createElement(
+	              "li",
+	              { key: search._id, className: "list-group-item", style: { borderWidth: "0px" } },
 	              React.createElement(
 	                "div",
-	                { type: "text", className: "form-control" },
+	                { className: "input-group" },
 	                React.createElement(
-	                  "b",
-	                  null,
-	                  "Obama Gives Commencement"
-	                )
-	              ),
-	              React.createElement(
-	                "span",
-	                { className: "input-group-btn" },
+	                  "div",
+	                  { type: "text", className: "form-control" },
+	                  React.createElement(
+	                    "b",
+	                    null,
+	                    search.headline.main
+	                  )
+	                ),
 	                React.createElement(
-	                  "button",
-	                  { className: "btn btn-success", type: "button" },
-	                  "Save"
+	                  "span",
+	                  { className: "input-group-btn" },
+	                  React.createElement(
+	                    "button",
+	                    { className: "btn btn-success", type: "button" },
+	                    "Save"
+	                  )
 	                )
 	              )
-	            )
-	          )
+	            );
+	          })
 	        )
 	      )
 	    );
@@ -22448,7 +22447,7 @@
 	
 	  var queryURL = "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=" + authKey + "&q=" + topic + "&begin_date=" + beginYear + "0101" + "&end_date=" + endYear + "1231";
 	
-	  // Create a JavaScript Promise
+	  // Create a JavaScript *Promise*
 	  return new Promise(function (fulfill, reject) {
 	    // NY Times API get request
 	    axios.get(queryURL).then(function (response) {
