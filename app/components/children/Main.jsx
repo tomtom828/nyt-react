@@ -11,7 +11,7 @@ var Search = require("./Search.jsx");
 var Saved = require("./Saved.jsx");
 
 // Requiring our helper for making API calls
-//var helpers = require("../utils/helpers.js");
+var helpers = require("../utils/helpers.js");
 
 // Create the Main Component
 var Main = React.createClass({
@@ -36,6 +36,19 @@ var Main = React.createClass({
   },
   setEndYear: function(term) {
     this.setState({ endYear: term });
+  },
+
+
+  // If the component changes (i.e. if a search is entered)...
+  componentDidUpdate: function() {
+
+    // Run the query for the address
+    helpers.articleQuery(this.state.topic, this.state.startYear, this.state.endYear).then(function(data) {
+      console.log(data);
+      this.setState({ apiResults: data });
+    }.bind(this));
+
+    console.log("Articles Seech")
   },
 
 
