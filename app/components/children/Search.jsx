@@ -14,10 +14,16 @@ var Search = React.createClass({
     };
   },
 
-  // NEED TO INCLUDE MORE FUNCTIONS HERE
+  _handleSave: function(event){
+    console.log(event.target.value.title)
+  },
 
   // Here we render the Search Results Panel
   render: function() {
+
+    // http://stackoverflow.com/questions/29810914/react-js-onclick-cant-pass-value-to-method
+    var that = this;
+
     return (
 
       <div className="panel panel-default">
@@ -37,7 +43,7 @@ var Search = React.createClass({
                   <div className="input-group">
                     <div type="text" className="form-control"><b>{search.headline.main}</b></div>
                     <span className="input-group-btn">
-                      <button className="btn btn-success" type="button">Save</button>
+                      <button className="btn btn-success" type="button" onClick={that._handleSave} value={ [{title: search.headline.main}, {date: search.pub_date}, {url: search.web_url}] }>Save</button>
                     </span>
                   </div>
                 </li>

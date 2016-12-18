@@ -21,34 +21,28 @@ var Main = React.createClass({
     return {
       apiResults: [],
       mongoResults: "",
-      topic: "",
-      startYear: "",
-      endYear: ""
+      searchTerms: ["","",""]
     };
   },
 
   // These functions allow children to update the parent.
-  setTopic: function(term) {
-    this.setState({ topic: term });
-  },
-  setStartYear: function(term) {
-    this.setState({ startYear: term });
-  },
-  setEndYear: function(term) {
-    this.setState({ endYear: term });
+  _setSearchFeilds: function(topic, start, end) {
+    this.setState({ searchTerms: [topic, start, end] });
   },
 
 
   // If the component changes (i.e. if a search is entered)...
-  componentDidUpdate: function() {
+  componentDidUpdate: function(prevProps, prevState) {
 
-    // Run the query for the address
-    helpers.articleQuery(this.state.topic, this.state.startYear, this.state.endYear).then(function(data) {
-      console.log(data);
-      this.setState({ apiResults: data });
-    }.bind(this));
+    // Only hit the API once; i.e. if the prev state does not equal the current
+    if(this.state.searchTerms != prevState.searchTerms){
+      // Run the query for the address
+      helpers.articleQuery(this.state.searchTerms[0], this.state.searchTerms[1], this.state.searchTerms[2]).then(function(data) {
+        //console.log(data);
+        this.setState({ apiResults: data });
+      }.bind(this));
+    }
 
-    console.log("Articles Seech")
   },
 
 
@@ -64,7 +58,7 @@ var Main = React.createClass({
           <h4 className="text-center">Search for and annotate articles of interest</h4>
         </div>
 
-        <Query setTopic={this.setTopic} setStartYear={this.setStartYear} setEndYear={this.setEndYear} />
+        <Query _setSearchFeilds={this._setSearchFeilds} />
         <Search apiResults={this.state.apiResults} />
         <Saved />
 

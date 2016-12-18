@@ -22037,33 +22037,26 @@
 	    return {
 	      apiResults: [],
 	      mongoResults: "",
-	      topic: "",
-	      startYear: "",
-	      endYear: ""
+	      searchTerms: ["", "", ""]
 	    };
 	  },
 	
 	  // These functions allow children to update the parent.
-	  setTopic: function setTopic(term) {
-	    this.setState({ topic: term });
-	  },
-	  setStartYear: function setStartYear(term) {
-	    this.setState({ startYear: term });
-	  },
-	  setEndYear: function setEndYear(term) {
-	    this.setState({ endYear: term });
+	  _setSearchFeilds: function _setSearchFeilds(topic, start, end) {
+	    this.setState({ searchTerms: [topic, start, end] });
 	  },
 	
 	  // If the component changes (i.e. if a search is entered)...
-	  componentDidUpdate: function componentDidUpdate() {
+	  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	
-	    // Run the query for the address
-	    helpers.articleQuery(this.state.topic, this.state.startYear, this.state.endYear).then(function (data) {
-	      console.log(data);
-	      this.setState({ apiResults: data });
-	    }.bind(this));
-	
-	    console.log("Articles Seech");
+	    // Only hit the API once; i.e. if the prev state does not equal the current
+	    if (this.state.searchTerms != prevState.searchTerms) {
+	      // Run the query for the address
+	      helpers.articleQuery(this.state.searchTerms[0], this.state.searchTerms[1], this.state.searchTerms[2]).then(function (data) {
+	        //console.log(data);
+	        this.setState({ apiResults: data });
+	      }.bind(this));
+	    }
 	  },
 	
 	  // Here we render the function
@@ -22098,7 +22091,7 @@
 	          "Search for and annotate articles of interest"
 	        )
 	      ),
-	      React.createElement(Query, { setTopic: this.setTopic, setStartYear: this.setStartYear, setEndYear: this.setEndYear }),
+	      React.createElement(Query, { _setSearchFeilds: this._setSearchFeilds }),
 	      React.createElement(Search, { apiResults: this.state.apiResults }),
 	      React.createElement(Saved, null)
 	    );
@@ -22145,9 +22138,7 @@
 	    event.preventDefault();
 	
 	    // Set the parent to have the search terms
-	    this.props.setTopic(this.state.topic);
-	    this.props.setStartYear(this.state.startYear);
-	    this.props.setEndYear(this.state.endYear);
+	    this.props._setSearchFeilds(this.state.topic, this.state.startYear, this.state.endYear);
 	
 	    // Reset the search terms
 	    this.setState({ topic: "" });
@@ -22269,10 +22260,16 @@
 	    };
 	  },
 	
-	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	  _handleSave: function _handleSave(event) {
+	    console.log(event.target.value.title);
+	  },
 	
 	  // Here we render the Search Results Panel
 	  render: function render() {
+	
+	    // http://stackoverflow.com/questions/29810914/react-js-onclick-cant-pass-value-to-method
+	    var that = this;
+	
 	    return React.createElement(
 	      "div",
 	      { className: "panel panel-default" },
@@ -22320,7 +22317,7 @@
 	                  { className: "input-group-btn" },
 	                  React.createElement(
 	                    "button",
-	                    { className: "btn btn-success", type: "button" },
+	                    { className: "btn btn-success", type: "button", onClick: that._handleSave, value: [{ title: search.headline.main }, { date: search.pub_date }, { url: search.web_url }] },
 	                    "Save"
 	                  )
 	                )
@@ -22467,7 +22464,7 @@
 	            result.push(response.data.response.docs[i]);
 	          }
 	        }
-	
+	        console.log(result);
 	        // Return the array of articles via *Promise*
 	        fulfill(result);
 	      } else {

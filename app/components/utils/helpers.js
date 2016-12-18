@@ -32,7 +32,7 @@ var articleQuery = function(topic, beginYear, endYear){
             result.push(response.data.response.docs[i]);
           }
         }
-
+console.log(result)
         // Return the array of articles via *Promise*
         fulfill(result);
         
