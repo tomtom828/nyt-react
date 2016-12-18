@@ -32,7 +32,7 @@ var articleQuery = function(topic, beginYear, endYear){
             result.push(response.data.response.docs[i]);
           }
         }
-console.log(result)
+
         // Return the array of articles via *Promise*
         fulfill(result);
         
@@ -49,7 +49,24 @@ console.log(result)
 
 
 
+// API Post Request Function
+var apiPost = function(articleObj){
+
+  // Get API Post URL (this allows it to work in both localhost and heroku)
+  var apiURL = window.location.origin + '/api/saved';
+
+  // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
+  var params = new URLSearchParams();
+  params.append("title", articleObj.title);
+  params.append("date", articleObj.date);
+  params.append("url", articleObj.url);
+  axios.post(apiURL, params);
+  
+}
+
+
 //Export all helper functions
 module.exports = {
- articleQuery
+ articleQuery,
+ apiPost
 }

@@ -22022,10 +22022,10 @@
 	// Here we include all of the sub-components
 	var Query = __webpack_require__(/*! ./Query.jsx */ 179);
 	var Search = __webpack_require__(/*! ./Search.jsx */ 180);
-	var Saved = __webpack_require__(/*! ./Saved.jsx */ 181);
+	var Saved = __webpack_require__(/*! ./Saved.jsx */ 207);
 	
 	// Requiring our helper for making API calls
-	var helpers = __webpack_require__(/*! ../utils/helpers.js */ 182);
+	var helpers = __webpack_require__(/*! ../utils/helpers.js */ 181);
 	
 	// Create the Main Component
 	var Main = React.createClass({
@@ -22248,6 +22248,9 @@
 	// Include React
 	var React = __webpack_require__(/*! react */ 1);
 	
+	// Requiring our helper for making API calls
+	var helpers = __webpack_require__(/*! ../utils/helpers.js */ 181);
+	
 	// Create the Search Component
 	var Search = React.createClass({
 	  displayName: "Search",
@@ -22256,12 +22259,25 @@
 	  // Here we set a generic state
 	  getInitialState: function getInitialState() {
 	    return {
-	      test: 0
+	      arrayOfArticles: []
 	    };
 	  },
 	
 	  _handleSave: function _handleSave(event) {
-	    console.log(event.target.value.title);
+	
+	    // Collect the clicked article's id
+	    var articleId = event.target.value;
+	
+	    // Collect the clicked article's attributes
+	    var saveArticleObj;
+	    for (var i = 0; i < this.state.arrayOfArticles.length; i++) {
+	      if (this.state.arrayOfArticles[i].id == articleId) {
+	        saveArticleObj = this.state.arrayOfArticles[i];
+	      }
+	    }
+	
+	    // Send this data to the API endpoint to save it to Mongo
+	    helpers.apiPost(saveArticleObj);
 	  },
 	
 	  // Here we render the Search Results Panel
@@ -22297,6 +22313,15 @@
 	          "ul",
 	          { className: "list-group col-md-8 col-md-offset-2" },
 	          this.props.apiResults.map(function (search, i) {
+	
+	            // Build array of articles
+	            that.state.arrayOfArticles.push({
+	              id: search._id,
+	              title: search.headline.main,
+	              date: search.pub_date,
+	              url: search.web_url
+	            });
+	
 	            return React.createElement(
 	              "li",
 	              { key: search._id, className: "list-group-item", style: { borderWidth: "0px" } },
@@ -22317,7 +22342,7 @@
 	                  { className: "input-group-btn" },
 	                  React.createElement(
 	                    "button",
-	                    { className: "btn btn-success", type: "button", onClick: that._handleSave, value: [{ title: search.headline.main }, { date: search.pub_date }, { url: search.web_url }] },
+	                    { className: "btn btn-success", type: "button", onClick: that._handleSave, value: search._id },
 	                    "Save"
 	                  )
 	                )
@@ -22335,98 +22360,6 @@
 
 /***/ },
 /* 181 */
-/*!*******************************************!*\
-  !*** ./app/components/children/Saved.jsx ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	// Displays the Saved Articles that were searched and stored in the database
-	
-	
-	// Include React
-	var React = __webpack_require__(/*! react */ 1);
-	
-	// Create the Search Component
-	var Saved = React.createClass({
-	  displayName: "Saved",
-	
-	
-	  // Here we set a generic state
-	  getInitialState: function getInitialState() {
-	    return {
-	      test: 0
-	    };
-	  },
-	
-	  // NEED TO INCLUDE MORE FUNCTIONS HERE
-	
-	  // Here we render the Search Results Panel
-	  render: function render() {
-	    return React.createElement(
-	      "div",
-	      { className: "panel panel-default" },
-	      React.createElement(
-	        "div",
-	        { className: "panel-heading" },
-	        React.createElement(
-	          "h3",
-	          { className: "panel-title text-center", style: { fontSize: "20px" } },
-	          React.createElement(
-	            "i",
-	            null,
-	            React.createElement(
-	              "b",
-	              null,
-	              "Saved Articles"
-	            )
-	          )
-	        )
-	      ),
-	      React.createElement(
-	        "div",
-	        { className: "panel-body" },
-	        React.createElement(
-	          "ul",
-	          { className: "list-group col-md-8 col-md-offset-2" },
-	          React.createElement(
-	            "li",
-	            { className: "list-group-item", style: { borderWidth: "0px" } },
-	            React.createElement(
-	              "div",
-	              { className: "input-group" },
-	              React.createElement(
-	                "div",
-	                { type: "text", className: "form-control" },
-	                React.createElement(
-	                  "b",
-	                  null,
-	                  "Giant Panda Rampages through NYC"
-	                )
-	              ),
-	              React.createElement(
-	                "span",
-	                { className: "input-group-btn" },
-	                React.createElement(
-	                  "button",
-	                  { className: "btn btn-danger", type: "button" },
-	                  "Remove"
-	                )
-	              )
-	            )
-	          )
-	        )
-	      )
-	    );
-	  }
-	});
-	
-	// Export the component back for use in Main file
-	module.exports = Saved;
-
-/***/ },
-/* 182 */
 /*!*****************************************!*\
   !*** ./app/components/utils/helpers.js ***!
   \*****************************************/
@@ -22435,7 +22368,7 @@
 	"use strict";
 	
 	// Node Dependencies
-	var axios = __webpack_require__(/*! axios */ 183);
+	var axios = __webpack_require__(/*! axios */ 182);
 	
 	// NY Times API Request Function
 	var articleQuery = function articleQuery(topic, beginYear, endYear) {
@@ -22464,7 +22397,7 @@
 	            result.push(response.data.response.docs[i]);
 	          }
 	        }
-	        console.log(result);
+	
 	        // Return the array of articles via *Promise*
 	        fulfill(result);
 	      } else {
@@ -22475,22 +22408,37 @@
 	  });
 	};
 	
+	// API Post Request Function
+	var apiPost = function apiPost(articleObj) {
+	
+	  // Get API Post URL (this allows it to work in both localhost and heroku)
+	  var apiURL = window.location.origin + '/api/saved';
+	
+	  // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
+	  var params = new URLSearchParams();
+	  params.append("title", articleObj.title);
+	  params.append("date", articleObj.date);
+	  params.append("url", articleObj.url);
+	  axios.post(apiURL, params);
+	};
+	
 	//Export all helper functions
 	module.exports = {
-	  articleQuery: articleQuery
+	  articleQuery: articleQuery,
+	  apiPost: apiPost
 	};
 
 /***/ },
-/* 183 */
+/* 182 */
 /*!**************************!*\
   !*** ./~/axios/index.js ***!
   \**************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./lib/axios */ 184);
+	module.exports = __webpack_require__(/*! ./lib/axios */ 183);
 
 /***/ },
-/* 184 */
+/* 183 */
 /*!******************************!*\
   !*** ./~/axios/lib/axios.js ***!
   \******************************/
@@ -22498,10 +22446,10 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./utils */ 185);
-	var bind = __webpack_require__(/*! ./helpers/bind */ 186);
-	var Axios = __webpack_require__(/*! ./core/Axios */ 187);
-	var defaults = __webpack_require__(/*! ./defaults */ 188);
+	var utils = __webpack_require__(/*! ./utils */ 184);
+	var bind = __webpack_require__(/*! ./helpers/bind */ 185);
+	var Axios = __webpack_require__(/*! ./core/Axios */ 186);
+	var defaults = __webpack_require__(/*! ./defaults */ 187);
 	
 	/**
 	 * Create an instance of Axios
@@ -22534,15 +22482,15 @@
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ 205);
-	axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ 206);
-	axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ 202);
+	axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ 204);
+	axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ 205);
+	axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ 201);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(/*! ./helpers/spread */ 207);
+	axios.spread = __webpack_require__(/*! ./helpers/spread */ 206);
 	
 	module.exports = axios;
 	
@@ -22551,7 +22499,7 @@
 
 
 /***/ },
-/* 185 */
+/* 184 */
 /*!******************************!*\
   !*** ./~/axios/lib/utils.js ***!
   \******************************/
@@ -22559,7 +22507,7 @@
 
 	'use strict';
 	
-	var bind = __webpack_require__(/*! ./helpers/bind */ 186);
+	var bind = __webpack_require__(/*! ./helpers/bind */ 185);
 	
 	/*global toString:true*/
 	
@@ -22859,7 +22807,7 @@
 
 
 /***/ },
-/* 186 */
+/* 185 */
 /*!*************************************!*\
   !*** ./~/axios/lib/helpers/bind.js ***!
   \*************************************/
@@ -22879,7 +22827,7 @@
 
 
 /***/ },
-/* 187 */
+/* 186 */
 /*!***********************************!*\
   !*** ./~/axios/lib/core/Axios.js ***!
   \***********************************/
@@ -22887,12 +22835,12 @@
 
 	'use strict';
 	
-	var defaults = __webpack_require__(/*! ./../defaults */ 188);
-	var utils = __webpack_require__(/*! ./../utils */ 185);
-	var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ 199);
-	var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ 200);
-	var isAbsoluteURL = __webpack_require__(/*! ./../helpers/isAbsoluteURL */ 203);
-	var combineURLs = __webpack_require__(/*! ./../helpers/combineURLs */ 204);
+	var defaults = __webpack_require__(/*! ./../defaults */ 187);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
+	var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ 198);
+	var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ 199);
+	var isAbsoluteURL = __webpack_require__(/*! ./../helpers/isAbsoluteURL */ 202);
+	var combineURLs = __webpack_require__(/*! ./../helpers/combineURLs */ 203);
 	
 	/**
 	 * Create a new instance of Axios
@@ -22973,7 +22921,7 @@
 
 
 /***/ },
-/* 188 */
+/* 187 */
 /*!*********************************!*\
   !*** ./~/axios/lib/defaults.js ***!
   \*********************************/
@@ -22981,8 +22929,8 @@
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(/*! ./utils */ 185);
-	var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ 189);
+	var utils = __webpack_require__(/*! ./utils */ 184);
+	var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ 188);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -22999,10 +22947,10 @@
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(/*! ./adapters/xhr */ 190);
+	    adapter = __webpack_require__(/*! ./adapters/xhr */ 189);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(/*! ./adapters/http */ 190);
+	    adapter = __webpack_require__(/*! ./adapters/http */ 189);
 	  }
 	  return adapter;
 	}
@@ -23076,7 +23024,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../process/browser.js */ 3)))
 
 /***/ },
-/* 189 */
+/* 188 */
 /*!****************************************************!*\
   !*** ./~/axios/lib/helpers/normalizeHeaderName.js ***!
   \****************************************************/
@@ -23084,7 +23032,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ../utils */ 185);
+	var utils = __webpack_require__(/*! ../utils */ 184);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -23097,7 +23045,7 @@
 
 
 /***/ },
-/* 190 */
+/* 189 */
 /*!*************************************!*\
   !*** ./~/axios/lib/adapters/xhr.js ***!
   \*************************************/
@@ -23105,13 +23053,13 @@
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
-	var settle = __webpack_require__(/*! ./../core/settle */ 191);
-	var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ 194);
-	var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ 195);
-	var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ 196);
-	var createError = __webpack_require__(/*! ../core/createError */ 192);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(/*! ./../helpers/btoa */ 197);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
+	var settle = __webpack_require__(/*! ./../core/settle */ 190);
+	var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ 193);
+	var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ 194);
+	var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ 195);
+	var createError = __webpack_require__(/*! ../core/createError */ 191);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(/*! ./../helpers/btoa */ 196);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -23207,7 +23155,7 @@
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(/*! ./../helpers/cookies */ 198);
+	      var cookies = __webpack_require__(/*! ./../helpers/cookies */ 197);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -23284,7 +23232,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../process/browser.js */ 3)))
 
 /***/ },
-/* 191 */
+/* 190 */
 /*!************************************!*\
   !*** ./~/axios/lib/core/settle.js ***!
   \************************************/
@@ -23292,7 +23240,7 @@
 
 	'use strict';
 	
-	var createError = __webpack_require__(/*! ./createError */ 192);
+	var createError = __webpack_require__(/*! ./createError */ 191);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -23318,7 +23266,7 @@
 
 
 /***/ },
-/* 192 */
+/* 191 */
 /*!*****************************************!*\
   !*** ./~/axios/lib/core/createError.js ***!
   \*****************************************/
@@ -23326,7 +23274,7 @@
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(/*! ./enhanceError */ 193);
+	var enhanceError = __webpack_require__(/*! ./enhanceError */ 192);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, and response.
@@ -23344,7 +23292,7 @@
 
 
 /***/ },
-/* 193 */
+/* 192 */
 /*!******************************************!*\
   !*** ./~/axios/lib/core/enhanceError.js ***!
   \******************************************/
@@ -23372,7 +23320,7 @@
 
 
 /***/ },
-/* 194 */
+/* 193 */
 /*!*****************************************!*\
   !*** ./~/axios/lib/helpers/buildURL.js ***!
   \*****************************************/
@@ -23380,7 +23328,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -23449,7 +23397,7 @@
 
 
 /***/ },
-/* 195 */
+/* 194 */
 /*!*********************************************!*\
   !*** ./~/axios/lib/helpers/parseHeaders.js ***!
   \*********************************************/
@@ -23457,7 +23405,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
 	
 	/**
 	 * Parse headers into an object
@@ -23495,7 +23443,7 @@
 
 
 /***/ },
-/* 196 */
+/* 195 */
 /*!************************************************!*\
   !*** ./~/axios/lib/helpers/isURLSameOrigin.js ***!
   \************************************************/
@@ -23503,7 +23451,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -23572,7 +23520,7 @@
 
 
 /***/ },
-/* 197 */
+/* 196 */
 /*!*************************************!*\
   !*** ./~/axios/lib/helpers/btoa.js ***!
   \*************************************/
@@ -23617,7 +23565,7 @@
 
 
 /***/ },
-/* 198 */
+/* 197 */
 /*!****************************************!*\
   !*** ./~/axios/lib/helpers/cookies.js ***!
   \****************************************/
@@ -23625,7 +23573,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -23679,7 +23627,7 @@
 
 
 /***/ },
-/* 199 */
+/* 198 */
 /*!************************************************!*\
   !*** ./~/axios/lib/core/InterceptorManager.js ***!
   \************************************************/
@@ -23687,7 +23635,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -23740,7 +23688,7 @@
 
 
 /***/ },
-/* 200 */
+/* 199 */
 /*!*********************************************!*\
   !*** ./~/axios/lib/core/dispatchRequest.js ***!
   \*********************************************/
@@ -23748,10 +23696,10 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
-	var transformData = __webpack_require__(/*! ./transformData */ 201);
-	var isCancel = __webpack_require__(/*! ../cancel/isCancel */ 202);
-	var defaults = __webpack_require__(/*! ../defaults */ 188);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
+	var transformData = __webpack_require__(/*! ./transformData */ 200);
+	var isCancel = __webpack_require__(/*! ../cancel/isCancel */ 201);
+	var defaults = __webpack_require__(/*! ../defaults */ 187);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -23828,7 +23776,7 @@
 
 
 /***/ },
-/* 201 */
+/* 200 */
 /*!*******************************************!*\
   !*** ./~/axios/lib/core/transformData.js ***!
   \*******************************************/
@@ -23836,7 +23784,7 @@
 
 	'use strict';
 	
-	var utils = __webpack_require__(/*! ./../utils */ 185);
+	var utils = __webpack_require__(/*! ./../utils */ 184);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -23857,7 +23805,7 @@
 
 
 /***/ },
-/* 202 */
+/* 201 */
 /*!****************************************!*\
   !*** ./~/axios/lib/cancel/isCancel.js ***!
   \****************************************/
@@ -23871,7 +23819,7 @@
 
 
 /***/ },
-/* 203 */
+/* 202 */
 /*!**********************************************!*\
   !*** ./~/axios/lib/helpers/isAbsoluteURL.js ***!
   \**********************************************/
@@ -23894,7 +23842,7 @@
 
 
 /***/ },
-/* 204 */
+/* 203 */
 /*!********************************************!*\
   !*** ./~/axios/lib/helpers/combineURLs.js ***!
   \********************************************/
@@ -23915,7 +23863,7 @@
 
 
 /***/ },
-/* 205 */
+/* 204 */
 /*!**************************************!*\
   !*** ./~/axios/lib/cancel/Cancel.js ***!
   \**************************************/
@@ -23943,7 +23891,7 @@
 
 
 /***/ },
-/* 206 */
+/* 205 */
 /*!*******************************************!*\
   !*** ./~/axios/lib/cancel/CancelToken.js ***!
   \*******************************************/
@@ -23951,7 +23899,7 @@
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(/*! ./Cancel */ 205);
+	var Cancel = __webpack_require__(/*! ./Cancel */ 204);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -24009,7 +23957,7 @@
 
 
 /***/ },
-/* 207 */
+/* 206 */
 /*!***************************************!*\
   !*** ./~/axios/lib/helpers/spread.js ***!
   \***************************************/
@@ -24043,6 +23991,98 @@
 	  };
 	};
 
+
+/***/ },
+/* 207 */
+/*!*******************************************!*\
+  !*** ./app/components/children/Saved.jsx ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	// Displays the Saved Articles that were searched and stored in the database
+	
+	
+	// Include React
+	var React = __webpack_require__(/*! react */ 1);
+	
+	// Create the Search Component
+	var Saved = React.createClass({
+	  displayName: "Saved",
+	
+	
+	  // Here we set a generic state
+	  getInitialState: function getInitialState() {
+	    return {
+	      test: 0
+	    };
+	  },
+	
+	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	
+	  // Here we render the Search Results Panel
+	  render: function render() {
+	    return React.createElement(
+	      "div",
+	      { className: "panel panel-default" },
+	      React.createElement(
+	        "div",
+	        { className: "panel-heading" },
+	        React.createElement(
+	          "h3",
+	          { className: "panel-title text-center", style: { fontSize: "20px" } },
+	          React.createElement(
+	            "i",
+	            null,
+	            React.createElement(
+	              "b",
+	              null,
+	              "Saved Articles"
+	            )
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        "div",
+	        { className: "panel-body" },
+	        React.createElement(
+	          "ul",
+	          { className: "list-group col-md-8 col-md-offset-2" },
+	          React.createElement(
+	            "li",
+	            { className: "list-group-item", style: { borderWidth: "0px" } },
+	            React.createElement(
+	              "div",
+	              { className: "input-group" },
+	              React.createElement(
+	                "div",
+	                { type: "text", className: "form-control" },
+	                React.createElement(
+	                  "b",
+	                  null,
+	                  "Giant Panda Rampages through NYC"
+	                )
+	              ),
+	              React.createElement(
+	                "span",
+	                { className: "input-group-btn" },
+	                React.createElement(
+	                  "button",
+	                  { className: "btn btn-danger", type: "button" },
+	                  "Remove"
+	                )
+	              )
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// Export the component back for use in Main file
+	module.exports = Saved;
 
 /***/ }
 /******/ ]);

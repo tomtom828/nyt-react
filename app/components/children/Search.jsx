@@ -4,18 +4,35 @@
 // Include React
 var React = require("react");
 
+// Requiring our helper for making API calls
+var helpers = require("../utils/helpers.js");
+
 // Create the Search Component
 var Search = React.createClass({
 
   // Here we set a generic state
   getInitialState: function() {
     return {
-      test: 0
+      arrayOfArticles: []
     };
   },
 
   _handleSave: function(event){
-    console.log(event.target.value.title)
+
+    // Collect the clicked article's id
+    var articleId = event.target.value;
+
+    // Collect the clicked article's attributes
+    var saveArticleObj;
+    for(var i=0; i<this.state.arrayOfArticles.length; i++){
+      if(this.state.arrayOfArticles[i].id == articleId){
+        saveArticleObj = this.state.arrayOfArticles[i];
+      }
+    }
+
+    // Send this data to the API endpoint to save it to Mongo
+    helpers.apiPost(saveArticleObj);
+
   },
 
   // Here we render the Search Results Panel
@@ -38,12 +55,21 @@ var Search = React.createClass({
             {/* ++++++++++++++++++++++++++++++++ ITERATE HERE ++++++++++++++++++++++++++++++++ */}
             {/* Here we use a map function to loop through an array in JSX */}
             {this.props.apiResults.map(function(search, i) {
+
+              // Build array of articles
+              that.state.arrayOfArticles.push({
+                id: search._id,
+                title: search.headline.main,
+                date: search.pub_date,
+                url: search.web_url
+              });
+
               return (
                 <li key={search._id} className="list-group-item" style={ {borderWidth: "0px"} }>
                   <div className="input-group">
                     <div type="text" className="form-control"><b>{search.headline.main}</b></div>
                     <span className="input-group-btn">
-                      <button className="btn btn-success" type="button" onClick={that._handleSave} value={ [{title: search.headline.main}, {date: search.pub_date}, {url: search.web_url}] }>Save</button>
+                      <button className="btn btn-success" type="button" onClick={that._handleSave} value={search._id}>Save</button>
                     </span>
                   </div>
                 </li>

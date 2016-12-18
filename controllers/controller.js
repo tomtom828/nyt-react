@@ -21,7 +21,22 @@ router.get("/api/saved", function(req, res) {
 
 // API POST - your components will use this to save an article to the database.
 router.post("/api/saved", function(req, res) {
-  res.send('save an article to the database')
+  
+  // Using the Article model, create a new entry (note that the "req.bidy" object has the exact same key-value pairs as the model)
+  var entry = new Article (req.body);
+
+  // Save the entry to MongoDB
+  entry.save(function(err, doc) {
+    // log any errors
+    if (err) {
+      console.log(err);
+    } 
+    // or log the doc that was saved to the DB
+    else {
+      console.log(doc);
+    }
+  });
+
 });
 
 
