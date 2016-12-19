@@ -2,6 +2,9 @@
 var axios = require('axios');
 
 
+
+
+
 // NY Times API Request Function
 var articleQuery = function(topic, beginYear, endYear){
 
@@ -49,24 +52,106 @@ var articleQuery = function(topic, beginYear, endYear){
 
 
 
+
+
 // API Post Request Function
-var apiPost = function(articleObj){
+var apiSave = function(articleObj){
 
   // Get API Post URL (this allows it to work in both localhost and heroku)
   var apiURL = window.location.origin + '/api/saved';
 
-  // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
-  var params = new URLSearchParams();
-  params.append("title", articleObj.title);
-  params.append("date", articleObj.date);
-  params.append("url", articleObj.url);
-  axios.post(apiURL, params);
+  // Create a JavaScript *Promise*
+  return new Promise(function (fulfill, reject){
+
+    // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
+    var params = new URLSearchParams();
+    params.append("title", articleObj.title);
+    params.append("date", articleObj.date);
+    params.append("url", articleObj.url);
+    axios.post(apiURL, params).then(function(response){
+
+      // Error handling / fullfil promise if successful query
+      if(response){
+        fulfill(response);
+      }
+      else{
+        reject("");
+      }
+      
+    })
+
+  });
   
 }
 
 
-//Export all helper functions
+
+
+
+// API Post Request Function
+var apiGet = function(){
+
+  // Get API Post URL (this allows it to work in both localhost and heroku)
+  var apiURL = window.location.origin + '/api/saved';
+
+  // Create a JavaScript *Promise*
+  return new Promise(function (fulfill, reject){
+
+    // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
+    axios.get(apiURL).then(function(response) {
+
+      // Error handling / fullfil promise if successful query
+      if(response){
+        fulfill(response);
+      }
+      else{
+        reject("");
+      }
+
+    });
+    
+  });
+  
+}
+
+
+
+
+
+// API Post Request Function
+var apiDelete = function(deleteArticleId){
+
+  // Get API Post URL (this allows it to work in both localhost and heroku)
+  var apiURL = window.location.origin + '/api/delete/' + deleteArticleId;
+
+  // Create a JavaScript *Promise*
+  return new Promise(function (fulfill, reject){
+
+    // Send the MongoDB Id for deletion
+    axios.post(apiURL).then(function(response) {
+
+      // Error handling / fullfil promise if successful query
+      if(response){
+        fulfill(response);
+      }
+      else{
+        reject("");
+      }
+
+    });
+
+  });
+
+}
+
+
+
+
+
+// Export all helper functions
 module.exports = {
  articleQuery,
- apiPost
+ apiSave,
+ apiGet,
+ apiDelete
 }

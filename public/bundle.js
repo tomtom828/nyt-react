@@ -22036,7 +22036,7 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      apiResults: [],
-	      mongoResults: "",
+	      mongoResults: [],
 	      searchTerms: ["", "", ""]
 	    };
 	  },
@@ -22044,6 +22044,20 @@
 	  // These functions allow children to update the parent.
 	  _setSearchFeilds: function _setSearchFeilds(topic, start, end) {
 	    this.setState({ searchTerms: [topic, start, end] });
+	  },
+	
+	  // Allow child to update Mongo data array
+	  _resetMongoResults: function _resetMongoResults(newData) {
+	    this.setState({ mongoResults: newData });
+	  },
+	
+	  // After the Main renders, collect the saved articles from the API endpoint
+	  componentDidMount: function componentDidMount() {
+	
+	    // Hit the Mongo API to get saved articles
+	    helpers.apiGet().then(function (query) {
+	      this.setState({ mongoResults: query.data });
+	    }.bind(this));
 	  },
 	
 	  // If the component changes (i.e. if a search is entered)...
@@ -22092,8 +22106,8 @@
 	        )
 	      ),
 	      React.createElement(Query, { _setSearchFeilds: this._setSearchFeilds }),
-	      React.createElement(Search, { apiResults: this.state.apiResults }),
-	      React.createElement(Saved, null)
+	      React.createElement(Search, { apiResults: this.state.apiResults, _resetMongoResults: this._resetMongoResults }),
+	      React.createElement(Saved, { mongoResults: this.state.mongoResults, _resetMongoResults: this._resetMongoResults })
 	    );
 	  }
 	});
@@ -22276,8 +22290,18 @@
 	      }
 	    }
 	
+	    // Copy "this" into "that" so that component is accessible inside the functions.
+	    var that = this;
+	
 	    // Send this data to the API endpoint to save it to Mongo
-	    helpers.apiPost(saveArticleObj);
+	    helpers.apiSave(saveArticleObj).then(function () {
+	
+	      // Re-set the Mongo data to account for a change in database (i.e. added an article)
+	      // By Querying Mongo Again for new Data, this will re-render the components in saved.jsx
+	      helpers.apiGet().then(function (query) {
+	        that.props._resetMongoResults(query.data);
+	      });
+	    }.bind(this));
 	  },
 	
 	  // Here we render the Search Results Panel
@@ -22334,7 +22358,17 @@
 	                  React.createElement(
 	                    "b",
 	                    null,
-	                    search.headline.main
+	                    React.createElement(
+	                      "a",
+	                      { href: search.web_url, target: "_new", style: { color: "black" } },
+	                      search.headline.main
+	                    )
+	                  ),
+	                  React.createElement(
+	                    "i",
+	                    null,
+	                    " ",
+	                    search.pub_date.substring(0, 10)
 	                  )
 	                ),
 	                React.createElement(
@@ -22409,23 +22443,81 @@
 	};
 	
 	// API Post Request Function
-	var apiPost = function apiPost(articleObj) {
+	var apiSave = function apiSave(articleObj) {
 	
 	  // Get API Post URL (this allows it to work in both localhost and heroku)
 	  var apiURL = window.location.origin + '/api/saved';
 	
-	  // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
-	  var params = new URLSearchParams();
-	  params.append("title", articleObj.title);
-	  params.append("date", articleObj.date);
-	  params.append("url", articleObj.url);
-	  axios.post(apiURL, params);
+	  // Create a JavaScript *Promise*
+	  return new Promise(function (fulfill, reject) {
+	
+	    // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
+	    var params = new URLSearchParams();
+	    params.append("title", articleObj.title);
+	    params.append("date", articleObj.date);
+	    params.append("url", articleObj.url);
+	    axios.post(apiURL, params).then(function (response) {
+	
+	      // Error handling / fullfil promise if successful query
+	      if (response) {
+	        fulfill(response);
+	      } else {
+	        reject("");
+	      }
+	    });
+	  });
 	};
 	
-	//Export all helper functions
+	// API Post Request Function
+	var apiGet = function apiGet() {
+	
+	  // Get API Post URL (this allows it to work in both localhost and heroku)
+	  var apiURL = window.location.origin + '/api/saved';
+	
+	  // Create a JavaScript *Promise*
+	  return new Promise(function (fulfill, reject) {
+	
+	    // Re-format the article Object to match the Mongo Model (ie we need to take off the the id)
+	    axios.get(apiURL).then(function (response) {
+	
+	      // Error handling / fullfil promise if successful query
+	      if (response) {
+	        fulfill(response);
+	      } else {
+	        reject("");
+	      }
+	    });
+	  });
+	};
+	
+	// API Post Request Function
+	var apiDelete = function apiDelete(deleteArticleId) {
+	
+	  // Get API Post URL (this allows it to work in both localhost and heroku)
+	  var apiURL = window.location.origin + '/api/delete/' + deleteArticleId;
+	
+	  // Create a JavaScript *Promise*
+	  return new Promise(function (fulfill, reject) {
+	
+	    // Send the MongoDB Id for deletion
+	    axios.post(apiURL).then(function (response) {
+	
+	      // Error handling / fullfil promise if successful query
+	      if (response) {
+	        fulfill(response);
+	      } else {
+	        reject("");
+	      }
+	    });
+	  });
+	};
+	
+	// Export all helper functions
 	module.exports = {
 	  articleQuery: articleQuery,
-	  apiPost: apiPost
+	  apiSave: apiSave,
+	  apiGet: apiGet,
+	  apiDelete: apiDelete
 	};
 
 /***/ },
@@ -24007,6 +24099,9 @@
 	// Include React
 	var React = __webpack_require__(/*! react */ 1);
 	
+	// Requiring our helper for making API calls
+	var helpers = __webpack_require__(/*! ../utils/helpers.js */ 181);
+	
 	// Create the Search Component
 	var Saved = React.createClass({
 	  displayName: "Saved",
@@ -24015,14 +24110,35 @@
 	  // Here we set a generic state
 	  getInitialState: function getInitialState() {
 	    return {
-	      test: 0
+	      doIneedThis: false
 	    };
 	  },
 	
-	  // NEED TO INCLUDE MORE FUNCTIONS HERE
+	  _handleDelete: function _handleDelete(event) {
+	
+	    // Collect the clicked article's id
+	    var articleMongoId = event.target.value;
+	
+	    // Copy "this" into "that" so that component is accessible inside the functions.
+	    var that = this;
+	
+	    // Send this data to the API endpoint to save it to Mongo
+	    helpers.apiDelete(articleMongoId).then(function () {
+	
+	      // Query Mongo Again for new Data (this will re-render the component to account for deletion)
+	      helpers.apiGet().then(function (query) {
+	        that.props._resetMongoResults(query.data);
+	      });
+	    });
+	  },
 	
 	  // Here we render the Search Results Panel
 	  render: function render() {
+	
+	    // http://stackoverflow.com/questions/29810914/react-js-onclick-cant-pass-value-to-method
+	    // another way could be using the bind() function. but why not try it this way too.
+	    var that = this;
+	
 	    return React.createElement(
 	      "div",
 	      { className: "panel panel-default" },
@@ -24049,32 +24165,45 @@
 	        React.createElement(
 	          "ul",
 	          { className: "list-group col-md-8 col-md-offset-2" },
-	          React.createElement(
-	            "li",
-	            { className: "list-group-item", style: { borderWidth: "0px" } },
-	            React.createElement(
-	              "div",
-	              { className: "input-group" },
+	          this.props.mongoResults.map(function (search, i) {
+	
+	            return React.createElement(
+	              "li",
+	              { key: search._id, className: "list-group-item", style: { borderWidth: "0px" } },
 	              React.createElement(
 	                "div",
-	                { type: "text", className: "form-control" },
+	                { className: "input-group" },
 	                React.createElement(
-	                  "b",
-	                  null,
-	                  "Giant Panda Rampages through NYC"
-	                )
-	              ),
-	              React.createElement(
-	                "span",
-	                { className: "input-group-btn" },
+	                  "div",
+	                  { type: "text", className: "form-control" },
+	                  React.createElement(
+	                    "b",
+	                    null,
+	                    React.createElement(
+	                      "a",
+	                      { href: search.url, target: "_new", style: { color: "black" } },
+	                      search.title
+	                    )
+	                  ),
+	                  React.createElement(
+	                    "i",
+	                    null,
+	                    " ",
+	                    search.date.substring(0, 10)
+	                  )
+	                ),
 	                React.createElement(
-	                  "button",
-	                  { className: "btn btn-danger", type: "button" },
-	                  "Remove"
+	                  "span",
+	                  { className: "input-group-btn" },
+	                  React.createElement(
+	                    "button",
+	                    { className: "btn btn-danger", type: "button", onClick: that._handleDelete, value: search._id },
+	                    "Remove"
+	                  )
 	                )
 	              )
-	            )
-	          )
+	            );
+	          })
 	        )
 	      )
 	    );

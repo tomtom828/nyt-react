@@ -30,8 +30,20 @@ var Search = React.createClass({
       }
     }
 
+    // Copy "this" into "that" so that component is accessible inside the functions.
+    var that = this;
+
     // Send this data to the API endpoint to save it to Mongo
-    helpers.apiPost(saveArticleObj);
+    helpers.apiSave(saveArticleObj).then(function(){
+
+      // Re-set the Mongo data to account for a change in database (i.e. added an article)
+      // By Querying Mongo Again for new Data, this will re-render the components in saved.jsx
+      helpers.apiGet().then(function(query){
+        that.props._resetMongoResults(query.data);
+      });
+
+
+    }.bind(this))
 
   },
 
@@ -67,7 +79,10 @@ var Search = React.createClass({
               return (
                 <li key={search._id} className="list-group-item" style={ {borderWidth: "0px"} }>
                   <div className="input-group">
-                    <div type="text" className="form-control"><b>{search.headline.main}</b></div>
+                    <div type="text" className="form-control">
+                      <b><a href={search.web_url} target="_new" style={ {color: "black"} }>{search.headline.main}</a></b>
+                      <i> {search.pub_date.substring(0, 10)}</i>
+                    </div>       
                     <span className="input-group-btn">
                       <button className="btn btn-success" type="button" onClick={that._handleSave} value={search._id}>Save</button>
                     </span>

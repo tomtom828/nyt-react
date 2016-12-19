@@ -20,7 +20,7 @@ var Main = React.createClass({
   getInitialState: function() {
     return {
       apiResults: [],
-      mongoResults: "",
+      mongoResults: [],
       searchTerms: ["","",""]
     };
   },
@@ -28,6 +28,21 @@ var Main = React.createClass({
   // These functions allow children to update the parent.
   _setSearchFeilds: function(topic, start, end) {
     this.setState({ searchTerms: [topic, start, end] });
+  },
+
+  // Allow child to update Mongo data array
+  _resetMongoResults: function(newData){
+    this.setState({ mongoResults: newData} );
+  },
+
+  // After the Main renders, collect the saved articles from the API endpoint
+  componentDidMount: function() {
+
+    // Hit the Mongo API to get saved articles
+    helpers.apiGet().then(function(query){
+      this.setState({mongoResults: query.data});
+    }.bind(this));
+
   },
 
 
@@ -59,8 +74,8 @@ var Main = React.createClass({
         </div>
 
         <Query _setSearchFeilds={this._setSearchFeilds} />
-        <Search apiResults={this.state.apiResults} />
-        <Saved />
+        <Search apiResults={this.state.apiResults} _resetMongoResults={this._resetMongoResults} />
+        <Saved mongoResults={this.state.mongoResults} _resetMongoResults={this._resetMongoResults} />
 
       </div>
 

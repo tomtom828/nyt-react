@@ -15,7 +15,19 @@ router.get("/", function(req, res) {
 
 // API GET - your components will use this to query MongoDB for all saved articles.
 router.get("/api/saved", function(req, res) {
-  res.send('query MongoDB for all saved articles')
+  
+  // Query Mongo for the Articles
+   Article.find({}, function(err, docs){
+      // log any errors
+      if (err){
+        console.log(err);
+      } 
+      // or send the doc to the browser as a json object
+      else {
+        res.json(docs);
+      }
+   });
+
 });
 
 
@@ -30,10 +42,12 @@ router.post("/api/saved", function(req, res) {
     // log any errors
     if (err) {
       console.log(err);
+      res.sendStatus(400);
     } 
     // or log the doc that was saved to the DB
     else {
       console.log(doc);
+      res.sendStatus(200);
     }
   });
 
@@ -41,8 +55,20 @@ router.post("/api/saved", function(req, res) {
 
 
 // API DELETE - your components will use this to delete a saved article in the database
-router.delete("/api/saved", function(req, res) {
-  res.send('delete a saved article in the database')
+router.post("/api/delete/:articleMongoId", function(req, res) {
+  console.log(req.params.articleMongoId)
+  Article.findByIdAndRemove(req.params.articleMongoId, function (err, todo) {
+    if (err) {
+      // Send Failure Header
+      console.log(err);      
+      res.sendStatus(400);
+    } 
+    else {
+      // Send Success Header
+      res.sendStatus(200);
+    }
+  });
+
 });
 
 
