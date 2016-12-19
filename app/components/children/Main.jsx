@@ -43,12 +43,12 @@ var Main = React.createClass({
       this.setState({mongoResults: query.data});
     }.bind(this));
 
-    console.log('API Results')
-    console.log(this.state.apiResults)
+    // console.log('API Results')
+    // console.log(this.state.apiResults)
 
-    console.log('')
-    console.log('Mongo Results')
-    console.log(this.state.mongoResults)
+    // console.log('')
+    // console.log('Mongo Results')
+    // console.log(this.state.mongoResults)
   },
 
 
