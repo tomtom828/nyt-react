@@ -1,7 +1,3 @@
-# nyt-react
-A Node, Express, MongoDB, and ReactJS 
-
-
 # :newspaper: NY Times ReactJS App :statue_of_liberty:
 A `NodeJS`, `MongoDB`, `Express`, and `ReactJS` application where users can query, display, and save articles from the [New York Times Article Search API](http://developer.nytimes.com/). Users can remove saved articles as well.
 
