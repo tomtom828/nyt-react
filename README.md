@@ -3,6 +3,8 @@ A `NodeJS`, `MongoDB`, `Express`, and `ReactJS` application where users can quer
 
 Please check out the deployed version in Heroku [here](https://ny-times-react.herokuapp.com/)!
 
+Click on the headlines to be re-directed to the full New York Times articles.
+
 
 ## Functionality
 On the backend, the app uses `express` to serve routes and `mongoose` to interact with a `MongoDB` database.
