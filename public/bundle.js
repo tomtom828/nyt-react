@@ -22058,6 +22058,13 @@
 	    helpers.apiGet().then(function (query) {
 	      this.setState({ mongoResults: query.data });
 	    }.bind(this));
+	
+	    console.log('API Results');
+	    console.log(this.state.apiResults);
+	
+	    console.log('');
+	    console.log('Mongo Results');
+	    console.log(this.state.mongoResults);
 	  },
 	
 	  // If the component changes (i.e. if a search is entered)...
@@ -22102,7 +22109,7 @@
 	        React.createElement(
 	          "h4",
 	          { className: "text-center" },
-	          "Search for and annotate articles of interest"
+	          "Search for and annotate articles of interest. Click on headlines to learn more."
 	        )
 	      ),
 	      React.createElement(Query, { _setSearchFeilds: this._setSearchFeilds }),
@@ -22155,9 +22162,9 @@
 	    this.props._setSearchFeilds(this.state.topic, this.state.startYear, this.state.endYear);
 	
 	    // Reset the search terms
-	    this.setState({ topic: "" });
-	    this.setState({ startYear: "" });
-	    this.setState({ endYear: "" });
+	    // this.setState({topic: ""});
+	    // this.setState({startYear: ""});
+	    // this.setState({endYear: ""});
 	  },
 	
 	  _handleTopicChange: function _handleTopicChange(e) {
